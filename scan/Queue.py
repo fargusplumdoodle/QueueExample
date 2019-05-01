@@ -39,7 +39,6 @@ class Queue(threading.Thread):
         :param job: Must be of Type job
         :return: scan_id (int)
         """
-
         # 1.
         assert type(job) == Job  # cant add non jobs to queue
 
@@ -74,7 +73,7 @@ class Queue(threading.Thread):
     def __start_ready_jobs(self):
         # TODO: add documentation
         # TODO: make queue smarter
-        if len(self.job_queue) > 0:
+        if len(self.job_queue) > 0 and len(self.running_jobs) < MAX_SCANS:
             # starting each job in order on the queue
             for x in range(len(self.job_queue)):
                 # Removing a job from the queue and executing it
@@ -118,11 +117,6 @@ class Queue(threading.Thread):
             4. Repeat
         """
         while self.running:
-            # TODO: REMOVE THIS
-            if False:
-                print("Running Jobs: " + str(self.running_jobs))
-                print("Queue: " + str(self.job_queue))
-
             # 1.
             self.__start_ready_jobs()
 

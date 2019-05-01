@@ -3,7 +3,7 @@ import time
 from collections import deque
 from .Queue import Queue, Job
 from .AbstractTool import DummyTool
-
+from QueueExample.conf import MAX_SCANS
 
 class TestQueue(TestCase):
     def setUp(self):
@@ -96,3 +96,14 @@ class TestQueue(TestCase):
 
         assert len(self.q.job_queue) == 0  # after 3 seconds all jobs should have been removed from the queue
 
+    def test_max_scans_limit(self):
+        # here we will add more scans than is allowed to be ran simultaniously
+        for x in range(MAX_SCANS + 5):
+            # adding job
+            self.q.add(self.get_job())
+
+        for x in range(20):  # looping an arbitrary amount of times
+            if len(self.q.job_queue) > 0:
+                assert len(self.q.running_jobs) <= MAX_SCANS  # Cannot have more jobs running than MAX_SCANS
+            else:
+                break
