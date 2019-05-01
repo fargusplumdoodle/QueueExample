@@ -1,6 +1,7 @@
 import random
 import time
 import threading
+from collections import deque
 from QueueExample.conf import MAX_SCANS
 
 
@@ -21,14 +22,15 @@ class Queue(threading.Thread):
 
     def __init__(self):
         super(Queue, self).__init__()
-        self.job_queue = []
+        self.job_queue = deque()
         self.running_jobs = set()
+        self.running = True
+
+    def stop(self):
+        self.running = False
 
     def add(self, job):
         """
-        TODO: Do we pass in a job object or the parameters that will be
-                passed to the job object?
-
         Procedure:
             1. Validate input
             2. Add job to end of queue
@@ -42,7 +44,7 @@ class Queue(threading.Thread):
         assert type(job) == Job  # cant add non jobs to queue
 
         # 2.
-        self.job_queue.append(job)
+        self.job_queue.appendleft(job)
 
         # 3.
         return job.id
@@ -60,8 +62,6 @@ class Queue(threading.Thread):
 
         To be ran internally from the self.start_ready_jobs function
         """
-        print("running tool: " + str(tool))
-
         # 1.
         tool.tool.start()
 
@@ -75,8 +75,10 @@ class Queue(threading.Thread):
         # TODO: add documentation
         # TODO: make queue smarter
         if len(self.job_queue) > 0:
-            # Removing a job from the queue and executing it
-            self.__execute_tool(self.job_queue.pop())
+            # starting each job in order on the queue
+            for x in range(len(self.job_queue)):
+                # Removing a job from the queue and executing it
+                self.__execute_tool(self.job_queue.pop())
 
     def __handle_finished_jobs(self):
         """
@@ -107,6 +109,7 @@ class Queue(threading.Thread):
 
     def run(self):
         """
+        This will only run until the Queue.stop variable is false
         Procedure:
             1. start any jobs if they are ready
             2. handle any jobs that are finished
@@ -114,7 +117,7 @@ class Queue(threading.Thread):
                 prevent unnecessarily overworking the CPU
             4. Repeat
         """
-        while True:
+        while self.running:
             # TODO: REMOVE THIS
             if False:
                 print("Running Jobs: " + str(self.running_jobs))
