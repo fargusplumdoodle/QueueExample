@@ -121,4 +121,4 @@ STATIC_URL = '/static/'
 
 # Queue system
 q = Queue()
-q.start()  # start queue thread
+#q.start()  # start queue thread
