@@ -14,8 +14,8 @@ COPY . .
 RUN pip install -r requirements.txt
 
 # updating database
-# RUN python manage.py makemigrations
-# RUN python manage.py migrate
+RUN python manage.py makemigrations
+RUN python manage.py migrate
 
 # for example: we could put this here to ensure we dont make broken containers
 RUN python manage.py test
